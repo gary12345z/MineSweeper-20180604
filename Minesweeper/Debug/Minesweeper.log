@@ -1,0 +1,4 @@
+﻿  stdafx.cpp
+  Minesweeper.cpp
+c:\users\hrb\source\repos\minesweeper\minesweeper\minesweeper.cpp(12): warning C4244: '引數': 將 'time_t' 轉換為 'unsigned int'，由於類型不同，可能導致資料遺失
+  Minesweeper.vcxproj -> C:\Users\HRB\source\repos\Minesweeper\Debug\Minesweeper.exe
