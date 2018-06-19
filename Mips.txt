@@ -1,8 +1,5 @@
-BROAD_SIZE: .word 8
-MINE_NUM: .word 10
-SIZE: .word 10
-MineMap: .word
-GameBroad: .word
+.text
+.globl main 
 
 main:
     jal SetMine
@@ -10,88 +7,171 @@ main:
 
 SetMine:
 Sec1:
-	li $t0,-1 
+	li $t0,0 
 Loop1:
-	addi $t0,1
-	li $t1,-1
-	bne $t0,SIZE,Loop2
-	j Sec2
+	li $t1,0
 Loop2:
-    muli $t2,$t0,SIZE
+	muli $t2,$t0,SIZE
     add $t2,$t2,$t1
     sll $t2,$t2,2
     addu $t3,$t2,MineMap
 	li $t4,-2
-    sw $t4,0($t3)
-    
+    sw $t4,0($t3) 
     addu $t3,$t2,GameBroad
-	li $t4,0
-    sw $t4,0($t3)
-    
-	addi $t1,1
-	bne $t1,SIZE,Loop2 
-	j Loop1 
+    sw $zero,0($t3)
+	addi $t1,$t1,1
+	bne $t1,SIZE,Loop2
+	addi $t0,$t0,1
+	bne $t0,SIZE,Loop1
+
 Sec2:
-    li $t0,-1   
+	li $t0,1 
 Loop3:
-	addi $t0,1
-	li $t1,-1
-	bne $t0,BROAD_SIZE,Loop4
-	j Sec3
+	li $t1,1
 Loop4:
-    muli $t2,$t0,SIZE
+	muli $t2,$t0,SIZE
     add $t2,$t2,$t1
     sll $t2,$t2,2
     addu $t3,$t2,MineMap
-	li $t4,0
-    sw $t4,0($t3)
-
-	addi $t1,1
-	bne $t1,BROAD_SIZE,Loop4
-	j Loop3
+    sw $zero,0($t3)
+	addi $t1,$t1,1
+	ble $t1,BROAD_SIZE,Loop4
+	addi $t0,$t0,1
+	ble $t0,BROAD_SIZE,Loop3
+	
 Sec3:
-    li $t0,MINE_NUM
-    bne $t0,$zero,Loop5
-    j Exit_Loop5    
-Loop5:    
+	li $a1,15
+    li $v0,40
+    syscall
+    li $t0,MINE_NUM    
+Loop5:  
     li $a1,64
     li $v0,42
     syscall
     sll $t2,$a0,2
-    addi $t2,MineMap
+    add $t2,$t2,MineMap
     lw $t3,0($t2)
-    bne $t3,$zero,Loop6
-    j Sec4   
-Loop6:
-    li $t3,-1
+    bne $t3,$zero,IfNot1
+	li $t3,-1
     sw $t3,0($t2)
-    addi $t0,-1
-    j Loop5    
-Sec4:
-    jr $ra
+	addi $t0,$t0,-1
+IfNot1:
+	bne $t0,$zero,Loop5
+	jr $ra        
     
 CountMine:
-    li $t0,-1 
+    li $t0,1
+Loop6:
+	li $t1,1
 Loop7:
-	addi $t0,1
-	li $t1,-1
-	bne $t0,SIZE,Loop8
-	jr $ra
-Loop8:
-    muli $t2,$t0,SIZE
+	muli $t2,$t0,SIZE
     add $t2,$t2,$t1
     sll $t2,$t2,2
     addu $t2,$t2,MineMap
     lw $t3,0($t2)
-    bne $t3,$zero,EndIf1
-    add $a0,$t0,$zero
+	bne $t3,$zero,IfNot2
+	add $a0,$t0,$zero
     add $a1,$t1,$zero
     jal Count
     sw $v0,0($t2)
-EndIf1:
-	addi $t1,1
-	bne $t1,SIZE,Loop8
-	j Loop7
+IfNot2:
+	addi $t1,$t1,1
+	bne $t1,SIZE,Loop7
+	addi $t0,$t0,1
+	bne $t0,SIZE,Loop6
+	jr $ra
 
 Count:
-    
+	addi $sp,$sp,-12
+	sw $t0 0($sp)
+	sw $t1 4($sp)
+	sw $t2 8($sp)
+	
+	li $t2,0
+	addi $t0,$a0,-1
+Loop8:
+	addi $t1,$a1,-1
+Loop9:
+	muli $t3,$t0,SIZE
+    add $t3,$t3,$t1
+    sll $t3,$t3,2
+    addu $t3,$t3,MineMap
+    lw $t3,0($t3)
+	li $t4 -1
+	bne $t3,$t4,IfNot3
+	addi $t2,$t2,1
+IfNot3:
+	addi $t1,$t1,1
+	bne $t1,SIZE,Loop9
+	addi $t0,$t0,1
+	bne $t0,SIZE,Loop8
+	
+	lw $t0 0($sp)
+	lw $t1 4($sp)
+	lw $t2 8($sp)
+	addi $sp,$sp,12
+	jr $ra
+	
+ShowBroad:
+	addi $sp,$sp,-12
+	sw $t0 0($sp)
+	sw $t1 4($sp)
+	sw $t2 8($sp)
+	
+	li $t0,1
+Loop10:
+	li $t1,1
+Loop11:
+	muli $t2,$t0,SIZE
+    add $t2,$t2,$t1
+    sll $t2,$t2,2
+    addu $t2,$t2,MineMap
+    lw $t3,0($t2)
+	bne $t3,$zero,IfNot4
+	add $a0,$t0,$zero
+    add $a1,$t1,$zero
+    jal Count
+    sw $v0,0($t2)
+	j IfNot6
+IfNot4:
+	bne $t3,$zero,IfNot5
+	add $a0,$t0,$zero
+    add $a1,$t1,$zero
+    jal Count
+    sw $v0,0($t2)
+	j IfNot6
+IfNot5:
+	add $a0,$t0,$zero
+    add $a1,$t1,$zero
+    jal Count
+    sw $v0,0($t2)
+IfNot6:
+	addi $t1,$t1,1
+	bne $t1,SIZE,Loop11
+	
+	add $a0,$t0,$zero
+    add $a1,$t1,$zero
+	
+	addi $t0,$t0,1
+	bne $t0,SIZE,Loop10
+	jr $ra
+
+	
+.data
+	BROAD_SIZE:	.word 8
+	MINE_NUM:	.word 10
+	SIZE:		.word 10
+	MineMap:	.word 	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+						
+	GameBroad:	.word	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+	unopen:		.asciiz "# "
+	mine:		.asciiz "X "
+	space:		.asciiz " "
+	ent:		.asciiz "\n"
