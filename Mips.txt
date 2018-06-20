@@ -9,20 +9,20 @@ main:
 	sw $t3,12($sp)
 	sw $t4,16($sp)
 	sw $t5,20($sp)
-    jal SetMine
-    jal CountMine
+	jal SetMine
+	jal CountMine
 	li $t0,0
 MainLoop:
 	jal ShowBroad
 	bne $v0,$zero,EndGame
 	li $v0,4
-    li $a0,askinput
-    syscall
+	li $a0,askinput
+	syscall
 	li $v0,5
-    syscall
+	syscall
 	move $t1,$v0
 	li $v0,5
-    syscall
+	syscall
 	move $t2,$v0
 	sle $t3,$t1,$zero
 	li $t5,BROAD_SIZE
@@ -34,8 +34,8 @@ MainLoop:
 	or $t3,$t3,$t4
 	bne $t3,$zero,InputCorrect
 	li $v0,4
-    li $a0,errorinput
-    syscall
+	li $a0,errorinput
+	syscall
 	j ExitIf
 InputCorrect:
 	move $a0,$t1
@@ -48,13 +48,13 @@ EndGame:
 	beq $t0,$zero,NotLose
 	jal ShowBroad
 	li $v0,4
-    li $a0,lose
-    syscall
+	li $a0,lose
+	syscall
 	j Exit
 NotLose:
 	li $v0,4
-    li $a0,win
-    syscall
+	li $a0,win
+	syscall
 Exit:
 	lw $t0,0($sp)
 	lw $t1,4($sp)
@@ -78,13 +78,13 @@ Loop1:
 	li $t1,0
 Loop2:
 	muli $t2,$t0,SIZE
-    add $t2,$t2,$t1
-    sll $t2,$t2,2
-    addu $t3,$t2,MineMap
+	add $t2,$t2,$t1
+	sll $t2,$t2,2
+	addu $t3,$t2,MineMap
 	li $t4,-2
-    sw $t4,0($t3) 
-    addu $t3,$t2,GameBroad
-    sw $zero,0($t3)
+	sw $t4,0($t3) 
+	addu $t3,$t2,GameBroad
+	sw $zero,0($t3)
 	addi $t1,$t1,1
 	bne $t1,SIZE,Loop2
 	addi $t0,$t0,1
@@ -96,10 +96,10 @@ Loop3:
 	li $t1,1
 Loop4:
 	muli $t2,$t0,SIZE
-    add $t2,$t2,$t1
-    sll $t2,$t2,2
-    addu $t3,$t2,MineMap
-    sw $zero,0($t3)
+	add $t2,$t2,$t1
+	sll $t2,$t2,2
+	addu $t3,$t2,MineMap
+	sw $zero,0($t3)
 	addi $t1,$t1,1
 	ble $t1,BROAD_SIZE,Loop4
 	addi $t0,$t0,1
@@ -107,19 +107,19 @@ Loop4:
 	
 Sec3:
 	li $a1,15
-    li $v0,40
-    syscall
-    li $t0,MINE_NUM    
+	li $v0,40
+	syscall
+	li $t0,MINE_NUM    
 Loop5:  
-    li $a1,64
-    li $v0,42
-    syscall
-    sll $t2,$a0,2
-    add $t2,$t2,MineMap
-    lw $t3,0($t2)
-    bne $t3,$zero,IfNot1
+	li $a1,64
+	li $v0,42
+	syscall
+	sll $t2,$a0,2
+	add $t2,$t2,MineMap
+	lw $t3,0($t2)
+	bne $t3,$zero,IfNot1
 	li $t3,-1
-    sw $t3,0($t2)
+	sw $t3,0($t2)
 	addi $t0,$t0,-1
 IfNot1:
 	bne $t0,$zero,Loop5
@@ -137,20 +137,20 @@ CountMine:
 	sw $t1,4($sp)
 	sw $t2,8($sp)
 	sw $t3,12($sp)
-    li $t0,1
+	li $t0,1
 Loop6:
 	li $t1,1
 Loop7:
 	muli $t2,$t0,SIZE
-    add $t2,$t2,$t1
-    sll $t2,$t2,2
-    addu $t2,$t2,MineMap
-    lw $t3,0($t2)
+	add $t2,$t2,$t1
+	sll $t2,$t2,2
+	addu $t2,$t2,MineMap
+	lw $t3,0($t2)
 	bne $t3,$zero,IfNot2
 	move $a0,$t0
-    move $a1,$t1
-    jal Count
-    sw $v0,0($t2)
+	move $a1,$t1
+	jal Count
+	sw $v0,0($t2)
 IfNot2:
 	addi $t1,$t1,1
 	bne $t1,SIZE,Loop7
@@ -174,10 +174,10 @@ Loop8:
 	addi $t1,$a1,-1
 Loop9:
 	muli $t3,$t0,SIZE
-    add $t3,$t3,$t1
-    sll $t3,$t3,2
-    addu $t3,$t3,MineMap
-    lw $t3,0($t3)
+	add $t3,$t3,$t1
+	sll $t3,$t3,2
+	addu $t3,$t3,MineMap
+	lw $t3,0($t3)
 	li $t4 -1
 	bne $t3,$t4,IfNot3
 	addi $t2,$t2,1
@@ -209,37 +209,37 @@ Loop10:
 	li $t1,1
 Loop11:
 	muli $t3,$t0,SIZE
-    add $t3,$t3,$t1
-    sll $t3,$t3,2
-    addu $t4,$t3,GameBroad
-    lw $t4,0($t4)
+	add $t3,$t3,$t1
+	sll $t3,$t3,2
+	addu $t4,$t3,GameBroad
+	lw $t4,0($t4)
 	bne $t4,$zero,IfNot4
 	li $v0,4
-    li $a0,unopen
-    syscall
+	li $a0,unopen
+	syscall
 	addi $t2,$t2,1
 	j IfNot6
 IfNot4:
 	addu $t4,$t3,MineMap
-    lw $t4,0($t4)
+	lw $t4,0($t4)
 	bltz $t4,IfNot5
 	li $v0,1
-    move $a0,$t4
-    syscall
+	move $a0,$t4
+	syscall
 	li $v0,4
-    li $a0,space
-    syscall
+	li $a0,space
+	syscall
 	j IfNot6
 IfNot5:
 	li $v0,4
-    li $a0,mine
-    syscall
+	li $a0,mine
+	syscall
 IfNot6:
 	addi $t1,$t1,1
 	bne $t1,SIZE,Loop11
 	li $v0,4
-    li $a0,ent
-    syscall
+	li $a0,ent
+	syscall
 	addi $t0,$t0,1
 	bne $t0,SIZE,Loop10
 	bne $t2,MINE_NUM,IfNot7
