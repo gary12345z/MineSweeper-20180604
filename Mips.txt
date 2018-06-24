@@ -2,13 +2,14 @@
 .globl main 
 #=================MAIN=================
 main:
-	addi $sp,$sp,-24
+	addi $sp,$sp,-28
 	sw $t0,0($sp)
 	sw $t1,4($sp)
 	sw $t2,8($sp)
 	sw $t3,12($sp)
 	sw $t4,16($sp)
 	sw $t5,20($sp)
+	sw $ra,24($sp)
 	jal SetMine
 	jal CountMine
 	li $t0,0
@@ -62,16 +63,18 @@ Exit:
 	lw $t3,12($sp)
 	lw $t4,16($sp)
 	lw $t5,20($sp)
-	addi $sp,$sp,24
+	lw $ra,24($sp)
+	addi $sp,$sp,28
 	jr $ra
 #=================SetMine=================
 SetMine:
-	addi $sp,$sp,-20
+	addi $sp,$sp,-24
 	sw $t0,0($sp)
 	sw $t1,4($sp)
 	sw $t2,8($sp)
 	sw $t3,12($sp)
 	sw $t4,16($sp)
+	sw $ra,20($sp)
 Sec1:
 	li $t0,0 
 Loop1:
@@ -128,15 +131,17 @@ IfNot1:
 	lw $t2,8($sp)
 	lw $t3,12($sp)
 	lw $t4,16($sp)
-	addi $sp,$sp,20
+	lw $ra,20($sp)
+	addi $sp,$sp,24
 	jr $ra       
 #=================CountMine=================   
 CountMine:
-	addi $sp,$sp,-16
+	addi $sp,$sp,-20
 	sw $t0,0($sp)
 	sw $t1,4($sp)
 	sw $t2,8($sp)
 	sw $t3,12($sp)
+	sw $ra,16($sp)
 	li $t0,1
 Loop6:
 	li $t1,1
@@ -153,21 +158,25 @@ Loop7:
 	sw $v0,0($t2)
 IfNot2:
 	addi $t1,$t1,1
-	bne $t1,SIZE,Loop7
+	ble $t1,BROAD_SIZE,Loop7
 	addi $t0,$t0,1
-	bne $t0,SIZE,Loop6
+	ble $t0,BROAD_SIZE,Loop6
 	lw $t0,0($sp)
 	lw $t1,4($sp)
 	lw $t2,8($sp)
 	lw $t3,12($sp)
-	addi $sp,$sp,16
+	lw $ra,16($sp)
+	addi $sp,$sp,20
 	jr $ra   
 #=================Count=================
 Count:
-	addi $sp,$sp,-12
-	sw $t0 0($sp)
-	sw $t1 4($sp)
-	sw $t2 8($sp)
+	addi $sp,$sp,-24
+	sw $t0,0($sp)
+	sw $t1,4($sp)
+	sw $t2,8($sp)
+	sw $t3,12($sp)
+	sw $t4,16($sp)
+	sw $ra,20($sp)
 	li $t2,0
 	addi $t0,$a0,-1
 Loop8:
@@ -183,26 +192,28 @@ Loop9:
 	addi $t2,$t2,1
 IfNot3:
 	addi $t1,$t1,1
-	bne $t1,SIZE,Loop9
+	addi $t4,$a1,1
+	ble $t1,$t4,Loop9
 	addi $t0,$t0,1
-	bne $t0,SIZE,Loop8
+	addi $t3,$a0,1
+	ble $t0,$t3,Loop8
 	lw $t0,0($sp)
 	lw $t1,4($sp)
 	lw $t2,8($sp)
-	addi $sp,$sp,12
+	lw $t3,12($sp)
+	lw $t4,16($sp)
+	lw $ra,20($sp)
+	addi $sp,$sp,24
 	jr $ra
 #=================ShowBroad=================	
 ShowBroad:
-	addi $sp,$sp,-20
+	addi $sp,$sp,-24
 	sw $t0,0($sp)
 	sw $t1,4($sp)
 	sw $t2,8($sp)
 	sw $t3,12($sp)
 	sw $t4,16($sp)
-	addi $sp,$sp,-12
-	sw $t0,0($sp)
-	sw $t1,4($sp)
-	sw $t2,8($sp)
+	sw $ra,20($sp)
 	li $t2,0
 	li $t0,1
 Loop10:
@@ -236,40 +247,42 @@ IfNot5:
 	syscall
 IfNot6:
 	addi $t1,$t1,1
-	bne $t1,SIZE,Loop11
+	ble $t1,BROAD_SIZE,Loop11
 	li $v0,4
 	li $a0,ent
 	syscall
 	addi $t0,$t0,1
-	bne $t0,SIZE,Loop10
+	ble $t0,BROAD_SIZE,Loop10
 	bne $t2,MINE_NUM,IfNot7
 	li v0,1
-	lw $t0,0($sp)
-	lw $t1,4($sp)
-	lw $t2,8($sp)
-	addi $sp,$sp,12
-	jr $ra
+	j ShowReturn
 IfNot7:
 	li v0,0
+ShowReturn:
 	lw $t0,0($sp)
 	lw $t1,4($sp)
 	lw $t2,8($sp)
 	lw $t3,12($sp)
 	lw $t4,16($sp)
-	addi $sp,$sp,20
+	lw $ra,20($sp)
+	addi $sp,$sp,24
 	jr $ra  
 #=================Step=================
 Step:
-	addi $sp,$sp,-20
+	addi $sp,$sp,-36
 	sw $t0,0($sp)
 	sw $t1,4($sp)
 	sw $t2,8($sp)
 	sw $t3,12($sp)
 	sw $t4,16($sp)
-	move $t0,$a0
-	move $t1,$a1
-	muli $t2,$t0,SIZE
-	add $t2,$t2,$t1
+	sw $t5,20($sp)
+	sw $a0,24($sp)
+	sw $a1,28($sp)
+	sw $ra,32($sp)
+	addi $t0,$a0,1
+	addi $t1,$a1,1
+	muli $t2,$a0,SIZE
+	add $t2,$t2,$a1
 	sll $t2,$t2,2
 	addu $t3,$t2,GameBroad
 	li $t4,1
@@ -281,86 +294,33 @@ Step:
 	li $v0,1
 	j StepReturn
 NotMine:
-	beq $t3,$zero,NotTouch
+	beq $t3,$zero,MineMapZero
 	li $v0,0
 	j StepReturn
-NotTouch:
-	sgt $t3,$t0,$zero
-	addi $t2,$t0,-1
-	muli $t2,$t2,SIZE
-	add $t2,$t2,$t1
-	sll $t2,$t2,2
-	addu $t4,$t2,MineMap
+MineMapZero:
+	addi $t2,$a0,-1
+Loop12:
+	addi $t3,$a1,-1
+Loop13:
+	muli $t4,$t2,SIZE
+	add $t4,$t4,$t3
+	sll $t4,$t4,2
+	addu $t5,$t4,MineMap
+	lw $t5,0($t5)
+	sge $t5,$t5,$zero
+	addu $t4,$t4,GameBroad
 	lw $t4,0($t4)
-	sge $t4,$t4,$zero
-	and $t3,$t3,$t4
-	addu $t4,$t2,GameBroad
-	lw $t4,0($t4)
-	seq $t4,$t4,$zero
-	and $t3,$t3,$t4
-	beq $t3,$zero,NotLeft
-	addi $t2,$t0,-1
+	seq	$t4,$t4,$zero
+	and $t4,$t4,$t5
+	beq $t4,$zero,NotStep
 	move $a0,$t2
-	move $a2,$t1
+	move $a1,$t3
 	jal Step
-NotLeft:
-	sle $t3,$t0,BROAD_SIZE
-	addi $t2,$t0,1
-	muli $t2,$t2,SIZE
-	add $t2,$t2,$t1
-	sll $t2,$t2,2
-	addu $t4,$t2,MineMap
-	lw $t4,0($t4)
-	sge $t4,$t4,$zero
-	and $t3,$t3,$t4
-	addu $t4,$t2,GameBroad
-	lw $t4,0($t4)
-	seq $t4,$t4,$zero
-	and $t3,$t3,$t4
-	beq $t3,$zero,NotLeft
-	addi $t2,$t0,1
-	move $a0,$t2
-	move $a2,$t1
-	jal Step
-NotRight:
-	sgt $t3,$t1,$zero
-	muli $t2,$t0,SIZE
-	add $t2,$t2,$t1
-	addi $t2,$t2,-1
-	sll $t2,$t2,2
-	addu $t4,$t2,MineMap
-	lw $t4,0($t4)
-	sge $t4,$t4,$zero
-	and $t3,$t3,$t4
-	addu $t4,$t2,GameBroad
-	lw $t4,0($t4)
-	seq $t4,$t4,$zero
-	and $t3,$t3,$t4
-	beq $t3,$zero,NotLeft
-	addi $t2,$t1,-1
-	move $a0,$t0
-	move $a2,$t2
-	jal Step
-NotDown:
-	sle $t3,$t1,BROAD_SIZE
-	muli $t2,$t2,SIZE
-	add $t2,$t2,$t1
+NotStep:
+	addi $t3,$t3,1
+	ble $t3,$t1,Loop13
 	addi $t2,$t2,1
-	sll $t2,$t2,2
-	addu $t4,$t2,MineMap
-	lw $t4,0($t4)
-	sge $t4,$t4,$zero
-	and $t3,$t3,$t4
-	addu $t4,$t2,GameBroad
-	lw $t4,0($t4)
-	seq $t4,$t4,$zero
-	and $t3,$t3,$t4
-	beq $t3,$zero,NotLeft
-	addi $t2,$t1,1
-	move $a0,$t0
-	move $a2,$t2
-	jal Step
-NotUp:
+	ble $t5,$t0,Loop12
 	li $v0,0
 StepReturn:
 	lw $t0,0($sp)
@@ -368,7 +328,11 @@ StepReturn:
 	lw $t2,8($sp)
 	lw $t3,12($sp)
 	lw $t4,16($sp)
-	addi $sp,$sp,20
+	lw $t5,20($sp)
+	lw $a0,24($sp)
+	lw $a1,28($sp)
+	lw $ra,32($sp)
+	addi $sp,$sp,36
 	jr $ra  
 #=================DATA=================
 .data
